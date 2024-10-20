@@ -3,7 +3,7 @@ import { Sprite, Container, useTick } from '@pixi/react';
 import { TILE_SIZE } from '../../constants/game-world';
 import { useHeroControls } from '../../hooks/useControls';
 import { Texture } from 'pixi.js';
-import { canWalk } from './collisionMap';
+import { canWalk } from '../../helpers/common';
 import { useHeroAnimation } from '../../hooks/useHeroAnimation';
 
 interface IHeroProps {

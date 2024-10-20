@@ -1,5 +1,5 @@
 import { useState, useMemo, PropsWithChildren, useCallback } from 'react';
-import { FederatedWheelEvent, Texture } from 'pixi.js';
+import { Texture } from 'pixi.js';
 import { Container } from '@pixi/react';
 import { Hero } from './Hero';
 import { Level } from './Level';

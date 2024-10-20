@@ -1,4 +1,3 @@
-import './App.css'
 import { PixiGrid } from './components/Experience/PixiGrid'
 
 const App = () => {

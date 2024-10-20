@@ -46,10 +46,8 @@ export const FollowingCamera = ({
       const targetX = canvasSize / 2 - heroPosition.x * TILE_SIZE * zoom - TILE_SIZE;
       const targetY = canvasSize / 2 - heroPosition.y * TILE_SIZE * zoom - TILE_SIZE;
 
-
       cameraPosition.current.x = lerp(cameraPosition.current.x, targetX, lerpFactor);
       cameraPosition.current.y = lerp(cameraPosition.current.y, targetY, lerpFactor);
-
 
       containerRef.current.x = cameraPosition.current.x;
       containerRef.current.y = cameraPosition.current.y;
