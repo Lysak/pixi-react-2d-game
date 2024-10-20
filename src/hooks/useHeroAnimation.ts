@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 
 import { TILE_SIZE } from '../constants/game-world'
 import { Rectangle, Sprite, Texture } from 'pixi.js'
+import { Direction } from '../types/game-world'
 
 interface UseSpriteAnimationProps {
   texture: Texture
@@ -15,12 +16,12 @@ export const useHeroAnimation = ({
   frameHeight,
 }: UseSpriteAnimationProps) => {
   const [sprite, setSprite] = useState<Sprite | null>(null)
-  const lastDirection = useRef<'UP' | 'DOWN' | 'LEFT' | 'RIGHT'>('DOWN')
+  const lastDirection = useRef<Direction>('DOWN')
   const frameRef = useRef(0)
   const elapsedTimeRef = useRef(0)
 
-  const getRowByDirection = (dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
-    switch (dir) {
+  const getRowByDirection = (direction: Direction) => {
+    switch (direction) {
       case 'UP':
         return 8
       case 'LEFT':
@@ -35,7 +36,7 @@ export const useHeroAnimation = ({
   }
 
   const updateSprite = (
-    direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | null,
+    direction: Direction,
     isMoving: boolean,
     animationSpeed: number
   ) => {

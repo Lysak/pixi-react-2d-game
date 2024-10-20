@@ -5,6 +5,7 @@ import { useHeroControls } from '../../hooks/useControls';
 import { Texture } from 'pixi.js';
 import { canWalk } from '../../helpers/common';
 import { useHeroAnimation } from '../../hooks/useHeroAnimation';
+import { Direction } from '../../types/game-world';
 
 interface IHeroProps {
   texture: Texture;
@@ -25,7 +26,7 @@ export const Hero = ({
   const gridPosition = useRef<{ gridX: number; gridY: number }>({ gridX: 0, gridY: 0 });
   const position = useRef<{ x: number; y: number }>({ x: X_POS, y: Y_POS });
   const { getCurrentDirection } = useHeroControls();
-  const [currentDirection, setCurrentDirection] = useState<'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | null>(null);
+  const [currentDirection, setCurrentDirection] = useState<Direction>(undefined);
   const targetPosition = useRef<{ x: number; y: number } | null>(null);
   const isMoving = useRef(false);
 
@@ -52,7 +53,7 @@ export const Hero = ({
   );
 
   const setNextTarget = useCallback(
-    (direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
+    (direction: Direction) => {
       if (targetPosition.current) return;
 
       const newTarget = {

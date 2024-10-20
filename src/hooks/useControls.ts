@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Direction } from '../types/game-world'
 
 const LEFT = 'LEFT'
 const RIGHT = 'RIGHT'
 const UP = 'UP'
 const DOWN = 'DOWN'
-
-type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | undefined
 
 export const useHeroControls = () => {
   const [heldDirections, setHeldDirections] = useState<Direction[]>([])
