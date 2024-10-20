@@ -12,3 +12,9 @@ export const canWalk = (row: number, col: number) => {
 
   return tile !== 1
 }
+
+export const calculateCanvasSize = () => {
+  const width = window.innerWidth
+  const height = window.innerHeight
+  return { width, height }
+}

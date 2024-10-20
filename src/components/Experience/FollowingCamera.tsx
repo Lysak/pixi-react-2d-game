@@ -4,10 +4,9 @@ import { Graphics as PIXIGraphics } from 'pixi.js';
 import { TILE_SIZE } from '../../constants/game-world';
 
 interface FollowingCameraProps {
-  radius: number;
   zoom: number;
   heroPosition: { x: number; y: number };
-  canvasSize: number;
+  canvasSize: { width: number, height: number };
 }
 
 const lerp = (start: number, end: number, t: number) => {
@@ -15,7 +14,6 @@ const lerp = (start: number, end: number, t: number) => {
 };
 
 export const FollowingCamera = ({
-
   zoom,
   heroPosition,
   canvasSize,
@@ -25,8 +23,8 @@ export const FollowingCamera = ({
   const containerRef = useRef<PIXIGraphics>(null);
 
   const cameraPosition = useRef<{ x: number; y: number }>({
-    x: canvasSize / 2,
-    y: canvasSize / 2,
+    x: canvasSize.width / 2,
+    y: canvasSize.height / 2,
   });
 
   const lerpFactor = 0.03;
@@ -34,8 +32,8 @@ export const FollowingCamera = ({
   useTick(() => {
     if (containerRef.current) {
 
-      const targetX = canvasSize / 2 - heroPosition.x * TILE_SIZE * zoom - TILE_SIZE;
-      const targetY = canvasSize / 2 - heroPosition.y * TILE_SIZE * zoom - TILE_SIZE;
+      const targetX = canvasSize.width / 2 - heroPosition.x * TILE_SIZE * zoom - TILE_SIZE;
+      const targetY = canvasSize.height / 2 - heroPosition.y * TILE_SIZE * zoom - TILE_SIZE;
 
       cameraPosition.current.x = lerp(cameraPosition.current.x, targetX, lerpFactor);
       cameraPosition.current.y = lerp(cameraPosition.current.y, targetY, lerpFactor);

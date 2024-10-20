@@ -8,15 +8,16 @@ import { FollowingCamera } from './FollowingCamera';
 import StarBackground from './StarBackground';
 import { Coin } from './Coin';
 import heroAsset from '../../assets/hero.png'
+import coinAsset from '../../assets/MonedaR.png'
 
 interface IMainContainerProps {
-  canvasSize: number;
+  canvasSize: { width: number, height: number };
 }
 
 const INITIAL_ZOOM = 3;
 const LEVEL_SIZE = 20;
 
-const MainContainer = ({
+export const MainContainer = ({
   canvasSize,
   children,
 }: PropsWithChildren<IMainContainerProps>) => {
@@ -31,11 +32,8 @@ const MainContainer = ({
   }, []);
 
   const coinTexture = useMemo(() => {
-    const imagePath = '/MonedaR.png';
-    return Texture.from(imagePath);
+    return Texture.from(coinAsset);
   }, []);
-
-  const viewportRadius = useMemo(() => canvasSize * 0.5, [canvasSize]);
 
   const levelSize = LEVEL_SIZE * TILE_SIZE;
 
@@ -43,7 +41,6 @@ const MainContainer = ({
     <Container  >
       {children}
       <FollowingCamera
-        radius={viewportRadius}
         zoom={INITIAL_ZOOM}
         heroPosition={heroPosition}
         canvasSize={canvasSize}
@@ -53,15 +50,11 @@ const MainContainer = ({
         <Hero
           texture={texture}
           onMove={updateHeroPosition}
-
         />
         <Coin texture={coinTexture} x={5} y={10} />
         <Coin texture={coinTexture} x={6} y={11} />
         <Coin texture={coinTexture} x={7} y={12} />
-
       </FollowingCamera>
     </Container>
   );
 };
-
-export default MainContainer;

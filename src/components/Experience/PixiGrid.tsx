@@ -1,17 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Stage } from '@pixi/react';
-import MainContainer from './MainContainer';
+import { MainContainer } from './MainContainer';
+import { calculateCanvasSize } from '../../helpers/common';
 
-const calculateCanvasSize = () => {
-  return Math.min(window.innerWidth, window.innerHeight) * 0.9
-}
+
 
 export const PixiGrid = () => {
   const [canvasSize, setCanvasSize] = useState(calculateCanvasSize());
 
   const updateCanvasSize = useCallback(() => {
-    const size = calculateCanvasSize();
-    setCanvasSize(size);
+    setCanvasSize(calculateCanvasSize());
   }, []);
 
   useEffect(() => {
@@ -21,22 +19,14 @@ export const PixiGrid = () => {
   }, [updateCanvasSize]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+    <Stage
+      width={canvasSize.width}
+      height={canvasSize.height}
+      options={{
+        backgroundAlpha: 0,
       }}
     >
-      <Stage
-        width={canvasSize}
-        height={canvasSize}
-        options={{
-          backgroundAlpha: 0,
-        }}
-      >
-        <MainContainer canvasSize={canvasSize}></MainContainer>
-      </Stage>
-    </div>
+      <MainContainer canvasSize={canvasSize} />
+    </Stage>
   );
 };
