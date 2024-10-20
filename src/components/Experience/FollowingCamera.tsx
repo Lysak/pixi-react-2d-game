@@ -1,5 +1,5 @@
-import { useRef, useEffect, PropsWithChildren } from 'react';
-import { Container, Graphics, useTick } from '@pixi/react';
+import { useRef, PropsWithChildren } from 'react';
+import { Container, useTick } from '@pixi/react';
 import { Graphics as PIXIGraphics } from 'pixi.js';
 import { TILE_SIZE } from '../../constants/game-world';
 
@@ -15,13 +15,13 @@ const lerp = (start: number, end: number, t: number) => {
 };
 
 export const FollowingCamera = ({
-  radius,
+
   zoom,
   heroPosition,
   canvasSize,
   children,
 }: PropsWithChildren<FollowingCameraProps>) => {
-  const maskRef = useRef<PIXIGraphics>(null);
+
   const containerRef = useRef<PIXIGraphics>(null);
 
   const cameraPosition = useRef<{ x: number; y: number }>({
@@ -30,15 +30,6 @@ export const FollowingCamera = ({
   });
 
   const lerpFactor = 0.03;
-
-  useEffect(() => {
-    if (maskRef.current) {
-      maskRef.current.clear();
-      maskRef.current.beginFill(0xffffff);
-      maskRef.current.drawCircle(canvasSize / 2, canvasSize / 2, radius);
-      maskRef.current.endFill();
-    }
-  }, [radius, canvasSize]);
 
   useTick(() => {
     if (containerRef.current) {
@@ -55,13 +46,11 @@ export const FollowingCamera = ({
   });
 
   return (
-    <Container>
-      <Graphics draw={() => { }} ref={maskRef} />
-      <Container mask={maskRef.current}>
-        <Container ref={containerRef} scale={zoom}>
-          {children}
-        </Container>
-      </Container>
+
+
+    <Container ref={containerRef} scale={zoom}>
+      {children}
     </Container>
+
   );
 };
