@@ -1,147 +1,88 @@
-import { useRef, useCallback, useState, useEffect } from 'react';
-import { Sprite, Container, useTick } from '@pixi/react';
-import { TILE_SIZE } from '../../constants/game-world';
-import { useHeroControls } from '../../hooks/useControls';
-import { Texture } from 'pixi.js';
-import { canWalk } from '../../helpers/common';
-import { useHeroAnimation } from '../../hooks/useHeroAnimation';
-import { Direction } from '../../types/game-world';
+import { useRef, useCallback, useState, useEffect } from 'react'
+import { Sprite, Container, useTick } from '@pixi/react'
+import { ANIMATION_SPEED, DEFAULT_X_POS, DEFAULT_Y_POS, MOVE_SPEED, TILE_SIZE } from '../../constants/game-world'
+import { useHeroControls } from '../../hooks/useControls'
+import { Texture } from 'pixi.js'
+import { canWalk } from '../../helpers/common'
+import { useHeroAnimation } from '../../hooks/useHeroAnimation'
+import { Direction } from '../../types/game-world'
 
 interface IHeroProps {
-  texture: Texture;
-  onMove: (gridX: number, gridY: number) => void;
+  texture: Texture
+  onMove: (gridX: number, gridY: number) => void
 }
 
-const MOVE_SPEED = 0.03;
-const ANIMATION_SPEED = 0.45;
+export const Hero = ({ texture, onMove }: IHeroProps) => {
+  const position = useRef({ x: DEFAULT_X_POS, y: DEFAULT_Y_POS })
+  const targetPosition = useRef<{ x: number; y: number } | null>(null)
+  const { getCurrentDirection } = useHeroControls()
+  const [currentDirection, setCurrentDirection] = useState<Direction>()
+  const isMoving = useRef(false)
 
-const X_POS = TILE_SIZE * 10
-const Y_POS = TILE_SIZE * 15
-
-export const Hero = ({
-  texture,
-  onMove,
-}: IHeroProps) => {
-
-  const gridPosition = useRef<{ gridX: number; gridY: number }>({ gridX: 0, gridY: 0 });
-  const position = useRef<{ x: number; y: number }>({ x: X_POS, y: Y_POS });
-  const { getCurrentDirection } = useHeroControls();
-  const [currentDirection, setCurrentDirection] = useState<Direction>(undefined);
-  const targetPosition = useRef<{ x: number; y: number } | null>(null);
-  const isMoving = useRef(false);
-
-  //initializing =>
+  // Initialize grid position
   useEffect(() => {
-    gridPosition.current.gridX = Math.floor(position.current.x / TILE_SIZE);
-    gridPosition.current.gridY = Math.floor(position.current.y / TILE_SIZE);
-    onMove?.(gridPosition.current.gridX, gridPosition.current.gridY);
+    onMove(Math.floor(position.current.x / TILE_SIZE), Math.floor(position.current.y / TILE_SIZE))
   }, [onMove])
 
-
-  const { sprite, updateSprite } = useHeroAnimation({
-    texture,
-    frameWidth: 64,
-    frameHeight: 64,
-  });
+  const { sprite, updateSprite } = useHeroAnimation({ texture, frameWidth: 64, frameHeight: 64 })
 
   const moveTowards = useCallback(
     (current: number, target: number, maxStep: number) => {
-      const step = Math.min(Math.abs(target - current), maxStep);
-      return Math.round(current + Math.sign(target - current) * step);
+      return Math.round(current + Math.sign(target - current) * Math.min(Math.abs(target - current), maxStep))
     },
     []
-  );
+  )
 
-  const setNextTarget = useCallback(
-    (direction: Direction) => {
-      if (targetPosition.current) return;
+  const setNextTarget = useCallback((direction: Direction) => {
+    if (targetPosition.current) return
 
-      const newTarget = {
-        x: Math.round(position.current.x / TILE_SIZE) * TILE_SIZE,
-        y: Math.round(position.current.y / TILE_SIZE) * TILE_SIZE,
-      };
+    const { x, y } = position.current
+    const newTarget = {
+      x: Math.round(x / TILE_SIZE) * TILE_SIZE + (direction === 'LEFT' ? -TILE_SIZE : direction === 'RIGHT' ? TILE_SIZE : 0),
+      y: Math.round(y / TILE_SIZE) * TILE_SIZE + (direction === 'UP' ? -TILE_SIZE : direction === 'DOWN' ? TILE_SIZE : 0),
+    }
 
-      switch (direction) {
-        case 'UP':
-          newTarget.y -= TILE_SIZE;
-          break;
-        case 'DOWN':
-          newTarget.y += TILE_SIZE;
-          break;
-        case 'LEFT':
-          newTarget.x -= TILE_SIZE;
-          break;
-        case 'RIGHT':
-          newTarget.x += TILE_SIZE;
-          break;
-      }
-
-
-      if (
-        canWalk(
-          Math.floor(newTarget.y / TILE_SIZE),
-          Math.floor(newTarget.x / TILE_SIZE)
-        ) &&
-        (newTarget.x !== position.current.x ||
-          newTarget.y !== position.current.y)
-      ) {
-        targetPosition.current = newTarget;
-      }
-    },
-    []
-  );
+    if (canWalk(Math.floor(newTarget.y / TILE_SIZE), Math.floor(newTarget.x / TILE_SIZE)) && (newTarget.x !== x || newTarget.y !== y)) {
+      targetPosition.current = newTarget
+    }
+  }, [])
 
   useTick((delta) => {
-    const direction = getCurrentDirection();
+    const direction = getCurrentDirection()
 
     if (!targetPosition.current && direction) {
-      setNextTarget(direction);
-      setCurrentDirection(direction);
+      setNextTarget(direction)
+      setCurrentDirection(direction)
     }
 
     if (targetPosition.current) {
-      isMoving.current = true;
-      const distance = Math.hypot(
-        targetPosition.current.x - position.current.x,
-        targetPosition.current.y - position.current.y
-      );
+      isMoving.current = true
+      const { x, y } = position.current
+      const { x: targetX, y: targetY } = targetPosition.current
+      const distance = Math.hypot(targetX - x, targetY - y)
 
       if (distance <= MOVE_SPEED * TILE_SIZE * delta) {
-        position.current = { ...targetPosition.current };
-        targetPosition.current = null;
-
-        gridPosition.current.gridX = Math.floor(position.current.x / TILE_SIZE);
-        gridPosition.current.gridY = Math.floor(position.current.y / TILE_SIZE);
-
-        onMove(gridPosition.current.gridX, gridPosition.current.gridY);
+        position.current = { ...targetPosition.current }
+        targetPosition.current = null
+        onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
 
         if (direction) {
-          setCurrentDirection(direction);
-          setNextTarget(direction);
+          setNextTarget(direction)
+          setCurrentDirection(direction)
         }
+
       } else {
-        const newX = moveTowards(
-          position.current.x,
-          targetPosition.current.x,
-          MOVE_SPEED * TILE_SIZE * delta
-        );
-        const newY = moveTowards(
-          position.current.y,
-          targetPosition.current.y,
-          MOVE_SPEED * TILE_SIZE * delta
-        );
-        position.current = { x: newX, y: newY };
+        position.current = {
+          x: moveTowards(x, targetX, MOVE_SPEED * TILE_SIZE * delta),
+          y: moveTowards(y, targetY, MOVE_SPEED * TILE_SIZE * delta),
+        }
       }
     } else {
-      isMoving.current = false;
+      isMoving.current = false
     }
 
-    updateSprite(currentDirection, isMoving.current, ANIMATION_SPEED);
-  });
-
-  const heroClickedHandler = () => {
-    console.log('Hero clicked');
-  };
+    updateSprite(currentDirection, isMoving.current, ANIMATION_SPEED)
+  })
 
   return (
     <Container>
@@ -153,9 +94,9 @@ export const Hero = ({
           y={position.current.y}
           anchor={[0, 0.4]}
           eventMode="dynamic"
-          pointerdown={heroClickedHandler}
+          pointerdown={() => console.log('Hero clicked')}
         />
       )}
     </Container>
-  );
-};
+  )
+}
