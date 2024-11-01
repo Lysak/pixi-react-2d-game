@@ -32,8 +32,8 @@ export const Coin = ({ texture, x, y }: ICoinProps) => {
       {sprite && (
         <Sprite
           texture={sprite.texture}
-          scale={1.3}
-          anchor={[-0.2, -0.1]}
+          scale={0.7}
+          anchor={[-0.85, -0.75]}
         />
       )}
     </Container>
