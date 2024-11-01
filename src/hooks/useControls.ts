@@ -79,10 +79,10 @@ export const useHeroControls = () => {
     }
   }, [handleKeyDown, handleKeyUp])
 
-  const getCurrentDirection = useCallback(
+  const getControlsDirection = useCallback(
     (): Direction | null => heldDirections[0] || null,
     [heldDirections]
   )
 
-  return { getCurrentDirection }
+  return { getControlsDirection }
 }

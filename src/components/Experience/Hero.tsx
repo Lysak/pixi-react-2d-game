@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect } from 'react'
+import { useRef, useCallback, useEffect } from 'react'
 import { Sprite, Container, useTick } from '@pixi/react'
 import { ANIMATION_SPEED, DEFAULT_X_POS, DEFAULT_Y_POS, MOVE_SPEED, TILE_SIZE } from '../../constants/game-world'
 import { useHeroControls } from '../../hooks/useControls'
@@ -15,8 +15,8 @@ interface IHeroProps {
 export const Hero = ({ texture, onMove }: IHeroProps) => {
   const position = useRef({ x: DEFAULT_X_POS, y: DEFAULT_Y_POS })
   const targetPosition = useRef<{ x: number; y: number } | null>(null)
-  const { getCurrentDirection } = useHeroControls()
-  const [currentDirection, setCurrentDirection] = useState<Direction>()
+  const currentDirection = useRef<Direction | null>(null)
+  const { getControlsDirection } = useHeroControls()
   const isMoving = useRef(false)
 
   // Initialize grid position
@@ -33,6 +33,16 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
     []
   )
 
+  const checkCanMove = useCallback((direction: Direction) => {
+    const { x, y } = position.current
+    const newTarget = {
+      x: Math.round(x / TILE_SIZE) * TILE_SIZE + (direction === 'LEFT' ? -TILE_SIZE : direction === 'RIGHT' ? TILE_SIZE : 0),
+      y: Math.round(y / TILE_SIZE) * TILE_SIZE + (direction === 'UP' ? -TILE_SIZE : direction === 'DOWN' ? TILE_SIZE : 0),
+    }
+
+    return canWalk(Math.floor(newTarget.y / TILE_SIZE), Math.floor(newTarget.x / TILE_SIZE))
+  }, [])
+
   const setNextTarget = useCallback((direction: Direction) => {
     if (targetPosition.current) return
 
@@ -42,46 +52,52 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       y: Math.round(y / TILE_SIZE) * TILE_SIZE + (direction === 'UP' ? -TILE_SIZE : direction === 'DOWN' ? TILE_SIZE : 0),
     }
 
-    if (canWalk(Math.floor(newTarget.y / TILE_SIZE), Math.floor(newTarget.x / TILE_SIZE)) && (newTarget.x !== x || newTarget.y !== y)) {
+    // Always update the visual direction
+    currentDirection.current = direction
+
+    // Only set target position if we can actually move there
+    if (checkCanMove(direction) && (newTarget.x !== x || newTarget.y !== y)) {
       targetPosition.current = newTarget
+      isMoving.current = true
+    } else {
+      isMoving.current = false
     }
-  }, [])
+  }, [checkCanMove])
 
   useTick((delta) => {
-    const direction = getCurrentDirection()
+    const nextDirection = getControlsDirection()
 
-    if (!targetPosition.current && direction) {
-      setNextTarget(direction)
-      setCurrentDirection(direction)
+    // Always update direction if it changes, even if we're not moving
+    if (nextDirection && (!isMoving.current || nextDirection !== currentDirection.current)) {
+      setNextTarget(nextDirection)
     }
 
     if (targetPosition.current) {
-      isMoving.current = true
       const { x, y } = position.current
       const { x: targetX, y: targetY } = targetPosition.current
       const distance = Math.hypot(targetX - x, targetY - y)
 
       if (distance <= MOVE_SPEED * TILE_SIZE * delta) {
+        // Complete the movement
         position.current = { ...targetPosition.current }
         targetPosition.current = null
         onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
+        isMoving.current = false
 
-        if (direction) {
-          setNextTarget(direction)
-          setCurrentDirection(direction)
+        // Check for next movement
+        if (nextDirection) {
+          setNextTarget(nextDirection)
         }
-
       } else {
+        // Continue movement
         position.current = {
           x: moveTowards(x, targetX, MOVE_SPEED * TILE_SIZE * delta),
           y: moveTowards(y, targetY, MOVE_SPEED * TILE_SIZE * delta),
         }
       }
-    } else {
-      isMoving.current = false
     }
 
-    updateSprite(currentDirection, isMoving.current, ANIMATION_SPEED)
+    updateSprite(currentDirection.current!, isMoving.current, ANIMATION_SPEED)
   })
 
   return (
