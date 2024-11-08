@@ -1,21 +1,19 @@
 import { useState, useMemo, PropsWithChildren, useCallback } from 'react'
 import { Texture } from 'pixi.js'
-import { Container } from '@pixi/react'
+import { Container, Sprite } from '@pixi/react'
 import { Hero } from './Hero'
 import { Level } from './Level'
-import { TILE_SIZE } from '../../constants/game-world'
 import { FollowingCamera } from './FollowingCamera'
-import StarBackground from './StarBackground'
 import { Coin } from './Coin'
 import heroAsset from '../../assets/hero.png'
 import coinAsset from '../../assets/MonedaR.png'
+import backgroundAsset from '../../assets/space-stars.jpg'
 
 interface IMainContainerProps {
   canvasSize: { width: number; height: number }
 }
 
 const INITIAL_ZOOM = 3
-const LEVEL_SIZE = 20
 
 export const MainContainer = ({
   canvasSize,
@@ -27,26 +25,20 @@ export const MainContainer = ({
     setHeroPosition({ x, y })
   }, [])
 
-  const texture = useMemo(() => {
-    return Texture.from(heroAsset)
-  }, [])
-
-  const coinTexture = useMemo(() => {
-    return Texture.from(coinAsset)
-  }, [])
-
-  const levelSize = LEVEL_SIZE * TILE_SIZE
+  // Load textures
+  const heroTexture = useMemo(() => Texture.from(heroAsset), [])
+  const coinTexture = useMemo(() => Texture.from(coinAsset), [])
+  const backgroundTexture = useMemo(() => Texture.from(backgroundAsset), [])
 
   return (
     <Container>
-      {children}
-      <StarBackground
-        width={levelSize}
-        height={levelSize}
-        starCount={1100}
-        scale={5}
-        offset={{ x: levelSize, y: levelSize }}
+      <Sprite
+        texture={backgroundTexture}
+        width={canvasSize.width}
+        height={canvasSize.height}
       />
+
+      {children}
 
       <FollowingCamera
         zoom={INITIAL_ZOOM}
@@ -54,7 +46,7 @@ export const MainContainer = ({
         canvasSize={canvasSize}
       >
         <Level />
-        <Hero texture={texture} onMove={updateHeroPosition} />
+        <Hero texture={heroTexture} onMove={updateHeroPosition} />
         <Coin texture={coinTexture} x={5} y={10} />
         <Coin texture={coinTexture} x={6} y={11} />
         <Coin texture={coinTexture} x={7} y={12} />
@@ -62,3 +54,5 @@ export const MainContainer = ({
     </Container>
   )
 }
+
+export default MainContainer
