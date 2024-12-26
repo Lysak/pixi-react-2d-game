@@ -5,9 +5,9 @@ import { Hero } from './Hero'
 import { Level } from './Level'
 import { FollowingCamera } from './FollowingCamera'
 import { Coin } from './Coin'
-import heroAsset from '../../assets/hero.png'
-import coinAsset from '../../assets/MonedaR.png'
-import backgroundAsset from '../../assets/space-stars.jpg'
+import heroAsset from '@/assets/hero.png'
+import coinAsset from '@/assets/MonedaR.png'
+import backgroundAsset from '@/assets/space-stars.jpg'
 
 interface IMainContainerProps {
   canvasSize: { width: number; height: number }
@@ -37,9 +37,7 @@ export const MainContainer = ({
         width={canvasSize.width}
         height={canvasSize.height}
       />
-
       {children}
-
       <FollowingCamera
         zoom={INITIAL_ZOOM}
         heroPosition={heroPosition}
