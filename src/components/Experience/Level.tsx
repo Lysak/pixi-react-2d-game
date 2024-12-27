@@ -1,5 +1,10 @@
-import { GAME_HEIGHT, GAME_WIDTH, OFFSET_X, OFFSET_Y } from "../../constants/game-world";
-import { Sprite } from '@pixi/react';
+import {
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  OFFSET_X,
+  OFFSET_Y,
+} from '../../constants/game-world'
+import { Sprite } from '@pixi/react'
 import levelAsset from '../../assets/tilemap.png'
 // import GridHelper from './GridHelper';
 
@@ -13,9 +18,8 @@ export const Level = () => {
         scale={1}
         x={OFFSET_X}
         y={OFFSET_Y}
-        onwheel={onwheel}
       />
       {/* <GridHelper /> */}
     </>
-  );
-};
+  )
+}
