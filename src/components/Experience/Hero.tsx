@@ -54,6 +54,50 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
     }
   }, [])
 
+  const completeMovement = useCallback(
+    (nextDirection: Direction | null) => {
+      const { x, y } = position.current
+      position.current = { ...targetPosition.current! }
+      targetPosition.current = null
+
+      onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
+      isMoving.current = false
+
+      if (nextDirection) {
+        setNextTarget(nextDirection)
+      }
+    },
+    [onMove, setNextTarget]
+  )
+
+  const continueMovement = useCallback((step: number) => {
+    const { x, y } = position.current
+    const { x: targetX, y: targetY } = targetPosition.current!
+
+    position.current = {
+      x: moveTowards(x, targetX, step),
+      y: moveTowards(y, targetY, step),
+    }
+  }, [])
+
+  const handleMovement = useCallback(
+    (delta: number, nextDirection: Direction | null) => {
+      if (!targetPosition.current) return
+
+      const { x, y } = position.current
+      const { x: targetX, y: targetY } = targetPosition.current
+      const step = MOVE_SPEED * TILE_SIZE * delta
+      const distance = Math.hypot(targetX - x, targetY - y)
+
+      if (distance <= step) {
+        completeMovement(nextDirection)
+      } else {
+        continueMovement(step)
+      }
+    },
+    [completeMovement, continueMovement]
+  )
+
   useTick((delta) => {
     const nextDirection = getControlsDirection()
 
@@ -61,31 +105,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       setNextTarget(nextDirection)
     }
 
-    if (targetPosition.current) {
-      const { x, y } = position.current
-      const { x: targetX, y: targetY } = targetPosition.current
-      const distance = Math.hypot(targetX - x, targetY - y)
-
-      if (distance <= MOVE_SPEED * TILE_SIZE * delta) {
-        // Complete the movement
-        position.current = { ...targetPosition.current }
-        targetPosition.current = null
-        onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
-        isMoving.current = false
-
-        // Check for next movement
-        if (nextDirection) {
-          setNextTarget(nextDirection)
-        }
-      } else {
-        // Continue movement
-        position.current = {
-          x: moveTowards(x, targetX, MOVE_SPEED * TILE_SIZE * delta),
-          y: moveTowards(y, targetY, MOVE_SPEED * TILE_SIZE * delta),
-        }
-      }
-    }
-
+    handleMovement(delta, nextDirection)
     updateSprite(currentDirection.current!, isMoving.current, ANIMATION_SPEED)
   })
 
