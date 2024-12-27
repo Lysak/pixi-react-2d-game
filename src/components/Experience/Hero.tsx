@@ -12,7 +12,7 @@ import { Texture } from 'pixi.js'
 import {
   calculateNewTarget,
   checkCanMove,
-  moveTowards,
+  handleMovement,
 } from '../../helpers/common'
 import { useHeroAnimation } from '../../hooks/useHeroAnimation'
 import { Direction } from '../../types/game-world'
@@ -28,6 +28,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
   const currentDirection = useRef<Direction | null>(null)
   const { getControlsDirection } = useHeroControls()
   const isMoving = useRef(false)
+
   const { sprite, updateSprite } = useHeroAnimation({
     texture,
     frameWidth: 64,
@@ -45,8 +46,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
     const { x, y } = position.current
     const newTarget = calculateNewTarget(x, y, direction)
 
-    //check and move =>
-    if (checkCanMove(newTarget) && (newTarget.x !== x || newTarget.y !== y)) {
+    if (checkCanMove(newTarget)) {
       targetPosition.current = newTarget
       isMoving.current = true
     } else {
@@ -54,58 +54,30 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
     }
   }, [])
 
-  const completeMovement = useCallback(
-    (nextDirection: Direction | null) => {
-      const { x, y } = position.current
-      position.current = { ...targetPosition.current! }
-      targetPosition.current = null
-
-      onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
-      isMoving.current = false
-
-      if (nextDirection) {
-        setNextTarget(nextDirection)
-      }
-    },
-    [onMove, setNextTarget]
-  )
-
-  const continueMovement = useCallback((step: number) => {
-    const { x, y } = position.current
-    const { x: targetX, y: targetY } = targetPosition.current!
-
-    position.current = {
-      x: moveTowards(x, targetX, step),
-      y: moveTowards(y, targetY, step),
-    }
-  }, [])
-
-  const handleMovement = useCallback(
-    (delta: number, nextDirection: Direction | null) => {
-      if (!targetPosition.current) return
-
-      const { x, y } = position.current
-      const { x: targetX, y: targetY } = targetPosition.current
-      const step = MOVE_SPEED * TILE_SIZE * delta
-      const distance = Math.hypot(targetX - x, targetY - y)
-
-      if (distance <= step) {
-        completeMovement(nextDirection)
-      } else {
-        continueMovement(step)
-      }
-    },
-    [completeMovement, continueMovement]
-  )
-
   useTick((delta) => {
     const nextDirection = getControlsDirection()
-
     if (nextDirection) {
       setNextTarget(nextDirection)
     }
+    if (targetPosition.current) {
+      const { position: newPosition, completed } = handleMovement(
+        position.current,
+        targetPosition.current,
+        MOVE_SPEED,
+        delta
+      )
 
-    handleMovement(delta, nextDirection)
+      position.current = newPosition
+
+      if (completed) {
+        const { x, y } = position.current
+        onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
+
+        targetPosition.current = null
+        isMoving.current = false
+      }
+    }
+
     updateSprite(currentDirection.current!, isMoving.current, ANIMATION_SPEED)
   })
 

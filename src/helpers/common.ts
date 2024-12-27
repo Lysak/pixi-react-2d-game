@@ -2,6 +2,11 @@ import { collisionMap } from '../constants/collisionMap'
 import { COLS, TILE_SIZE } from '../constants/game-world'
 import { Direction } from '../types/game-world'
 
+interface Position {
+  x: number
+  y: number
+}
+
 export const calculateCanvasSize = () => {
   const width = window.innerWidth
   const height = window.innerHeight
@@ -12,7 +17,7 @@ export const calculateNewTarget = (
   x: number,
   y: number,
   direction: Direction
-) => {
+): Position => {
   return {
     x:
       (x / TILE_SIZE) * TILE_SIZE +
@@ -27,7 +32,7 @@ export const calculateNewTarget = (
   }
 }
 
-export const checkCanMove = (target: { x: number; y: number }) => {
+export const checkCanMove = (target: Position) => {
   const row = Math.floor(target.y / TILE_SIZE)
   const col = Math.floor(target.x / TILE_SIZE)
   const index = COLS * row + col
@@ -48,4 +53,40 @@ export const moveTowards = (
     current +
     Math.sign(target - current) * Math.min(Math.abs(target - current), maxStep)
   )
+}
+
+export const continueMovement = (
+  currentPosition: Position,
+  targetPosition: Position,
+  step: number
+): Position => {
+  return {
+    x: moveTowards(currentPosition.x, targetPosition.x, step),
+    y: moveTowards(currentPosition.y, targetPosition.y, step),
+  }
+}
+
+export const handleMovement = (
+  currentPosition: Position,
+  targetPosition: Position,
+  moveSpeed: number,
+  delta: number
+) => {
+  const step = moveSpeed * TILE_SIZE * delta
+  const distance = Math.hypot(
+    targetPosition.x - currentPosition.x,
+    targetPosition.y - currentPosition.y
+  )
+
+  if (distance <= step) {
+    return {
+      position: targetPosition,
+      completed: true,
+    }
+  }
+
+  return {
+    position: continueMovement(currentPosition, targetPosition, step),
+    completed: false,
+  }
 }
