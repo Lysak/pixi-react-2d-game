@@ -41,23 +41,19 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
 
   const setNextTarget = useCallback((direction: Direction) => {
     if (targetPosition.current) return
-    currentDirection.current = direction
-
     const { x, y } = position.current
+    currentDirection.current = direction
     const newTarget = calculateNewTarget(x, y, direction)
 
     if (checkCanMove(newTarget)) {
       targetPosition.current = newTarget
-      isMoving.current = true
-    } else {
-      isMoving.current = false
     }
   }, [])
 
   useTick((delta) => {
-    const nextDirection = getControlsDirection()
-    if (nextDirection) {
-      setNextTarget(nextDirection)
+    const direction = getControlsDirection()
+    if (direction) {
+      setNextTarget(direction)
     }
     if (targetPosition.current) {
       const { position: newPosition, completed } = handleMovement(
@@ -68,6 +64,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       )
 
       position.current = newPosition
+      isMoving.current = true
 
       if (completed) {
         const { x, y } = position.current

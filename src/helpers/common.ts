@@ -1,11 +1,6 @@
 import { collisionMap } from '../constants/collisionMap'
 import { COLS, TILE_SIZE } from '../constants/game-world'
-import { Direction } from '../types/game-world'
-
-interface Position {
-  x: number
-  y: number
-}
+import { Direction, IPosition } from '../types/game-world'
 
 export const calculateCanvasSize = () => {
   const width = window.innerWidth
@@ -17,7 +12,7 @@ export const calculateNewTarget = (
   x: number,
   y: number,
   direction: Direction
-): Position => {
+): IPosition => {
   return {
     x:
       (x / TILE_SIZE) * TILE_SIZE +
@@ -32,7 +27,7 @@ export const calculateNewTarget = (
   }
 }
 
-export const checkCanMove = (target: Position) => {
+export const checkCanMove = (target: IPosition) => {
   const row = Math.floor(target.y / TILE_SIZE)
   const col = Math.floor(target.x / TILE_SIZE)
   const index = COLS * row + col
@@ -56,10 +51,10 @@ export const moveTowards = (
 }
 
 export const continueMovement = (
-  currentPosition: Position,
-  targetPosition: Position,
+  currentPosition: IPosition,
+  targetPosition: IPosition,
   step: number
-): Position => {
+): IPosition => {
   return {
     x: moveTowards(currentPosition.x, targetPosition.x, step),
     y: moveTowards(currentPosition.y, targetPosition.y, step),
@@ -67,8 +62,8 @@ export const continueMovement = (
 }
 
 export const handleMovement = (
-  currentPosition: Position,
-  targetPosition: Position,
+  currentPosition: IPosition,
+  targetPosition: IPosition,
   moveSpeed: number,
   delta: number
 ) => {
