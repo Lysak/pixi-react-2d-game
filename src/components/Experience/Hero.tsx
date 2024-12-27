@@ -5,7 +5,6 @@ import {
   DEFAULT_X_POS,
   DEFAULT_Y_POS,
   MOVE_SPEED,
-  TILE_SIZE,
 } from '../../constants/game-world'
 import { useHeroControls } from '../../hooks/useControls'
 import { Texture } from 'pixi.js'
@@ -36,7 +35,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
   })
 
   useEffect(() => {
-    onMove(position.current.x / TILE_SIZE, position.current.y / TILE_SIZE)
+    onMove(position.current.x, position.current.y)
   }, [onMove])
 
   const setNextTarget = useCallback((direction: Direction) => {
@@ -68,7 +67,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
 
       if (completed) {
         const { x, y } = position.current
-        onMove(Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE))
+        onMove(x, y)
 
         targetPosition.current = null
         isMoving.current = false

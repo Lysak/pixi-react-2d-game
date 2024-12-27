@@ -8,6 +8,7 @@ import { Coin } from './Coin'
 import heroAsset from '@/assets/hero.png'
 import coinAsset from '@/assets/MonedaR.png'
 import backgroundAsset from '@/assets/space-stars.jpg'
+import { TILE_SIZE } from '../../constants/game-world'
 
 interface IMainContainerProps {
   canvasSize: { width: number; height: number }
@@ -21,14 +22,16 @@ export const MainContainer = ({
 }: PropsWithChildren<IMainContainerProps>) => {
   const [heroPosition, setHeroPosition] = useState({ x: 0, y: 0 })
 
-  const updateHeroPosition = useCallback((x: number, y: number) => {
-    setHeroPosition({ x, y })
-  }, [])
-
-  // Load textures
   const heroTexture = useMemo(() => Texture.from(heroAsset), [])
   const coinTexture = useMemo(() => Texture.from(coinAsset), [])
   const backgroundTexture = useMemo(() => Texture.from(backgroundAsset), [])
+
+  const updateHeroPosition = useCallback((x: number, y: number) => {
+    setHeroPosition({
+      x: Math.floor(x / TILE_SIZE),
+      y: Math.floor(y / TILE_SIZE),
+    })
+  }, [])
 
   return (
     <Container>
