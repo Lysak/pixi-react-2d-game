@@ -9,7 +9,11 @@ import {
 } from '../../constants/game-world'
 import { useHeroControls } from '../../hooks/useControls'
 import { Texture } from 'pixi.js'
-import { canWalk } from '../../helpers/common'
+import {
+  calculateNewTarget,
+  checkCanMove,
+  moveTowards,
+} from '../../helpers/common'
 import { useHeroAnimation } from '../../hooks/useHeroAnimation'
 import { Direction } from '../../types/game-world'
 
@@ -24,89 +28,36 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
   const currentDirection = useRef<Direction | null>(null)
   const { getControlsDirection } = useHeroControls()
   const isMoving = useRef(false)
-
-  // Initialize grid position
-  useEffect(() => {
-    onMove(position.current.x / TILE_SIZE, position.current.y / TILE_SIZE)
-  }, [onMove])
-
   const { sprite, updateSprite } = useHeroAnimation({
     texture,
     frameWidth: 64,
     frameHeight: 64,
   })
 
-  const moveTowards = useCallback(
-    (current: number, target: number, maxStep: number) => {
-      return (
-        current +
-        Math.sign(target - current) *
-          Math.min(Math.abs(target - current), maxStep)
-      )
-    },
-    []
-  )
+  useEffect(() => {
+    onMove(position.current.x / TILE_SIZE, position.current.y / TILE_SIZE)
+  }, [onMove])
 
-  const calculateNewTarget = useCallback(
-    (x: number, y: number, direction: Direction) => {
-      return {
-        x:
-          (x / TILE_SIZE) * TILE_SIZE +
-          (direction === 'LEFT'
-            ? -TILE_SIZE
-            : direction === 'RIGHT'
-            ? TILE_SIZE
-            : 0),
-        y:
-          (y / TILE_SIZE) * TILE_SIZE +
-          (direction === 'UP'
-            ? -TILE_SIZE
-            : direction === 'DOWN'
-            ? TILE_SIZE
-            : 0),
-      }
-    },
-    []
-  )
+  const setNextTarget = useCallback((direction: Direction) => {
+    if (targetPosition.current) return
+    currentDirection.current = direction
 
-  const checkCanMove = useCallback(
-    (direction: Direction) => {
-      const { x, y } = position.current
-      const newTarget = calculateNewTarget(x, y, direction)
-      return canWalk(newTarget.y / TILE_SIZE, newTarget.x / TILE_SIZE)
-    },
-    [calculateNewTarget]
-  )
+    const { x, y } = position.current
+    const newTarget = calculateNewTarget(x, y, direction)
 
-  const setNextTarget = useCallback(
-    (direction: Direction) => {
-      if (targetPosition.current) return
-
-      const { x, y } = position.current
-      const newTarget = calculateNewTarget(x, y, direction)
-
-      // Always update the visual direction
-      currentDirection.current = direction
-
-      // Only set target position if we can actually move there
-      if (checkCanMove(direction) && (newTarget.x !== x || newTarget.y !== y)) {
-        targetPosition.current = newTarget
-        isMoving.current = true
-      } else {
-        isMoving.current = false
-      }
-    },
-    [checkCanMove, calculateNewTarget]
-  )
+    //check and move =>
+    if (checkCanMove(newTarget) && (newTarget.x !== x || newTarget.y !== y)) {
+      targetPosition.current = newTarget
+      isMoving.current = true
+    } else {
+      isMoving.current = false
+    }
+  }, [])
 
   useTick((delta) => {
     const nextDirection = getControlsDirection()
 
-    // Always update direction if it changes, even if we're not moving
-    if (
-      nextDirection &&
-      (!isMoving.current || nextDirection !== currentDirection.current)
-    ) {
+    if (nextDirection) {
       setNextTarget(nextDirection)
     }
 
@@ -143,12 +94,10 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       {sprite && (
         <Sprite
           texture={sprite.texture}
-          scale={0.5}
           x={position.current.x}
           y={position.current.y}
+          scale={0.5}
           anchor={[0, 0.4]}
-          eventMode="dynamic"
-          pointerdown={() => console.log('Hero clicked')}
         />
       )}
     </Container>
