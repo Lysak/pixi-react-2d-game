@@ -1,4 +1,4 @@
-import { collisionMap } from '../constants/collisionMap'
+import { COLLISION_MAP } from '../constants/collision-map'
 import { COLS, TILE_SIZE } from '../constants/game-world'
 import { Direction, IPosition } from '../types/game-world'
 
@@ -32,11 +32,11 @@ export const checkCanMove = (target: IPosition) => {
   const col = Math.floor(target.x / TILE_SIZE)
   const index = COLS * row + col
 
-  if (index < 0 || index >= collisionMap.length) {
+  if (index < 0 || index >= COLLISION_MAP.length) {
     return false
   }
 
-  return collisionMap[index] !== 1
+  return COLLISION_MAP[index] !== 1
 }
 
 export const moveTowards = (
