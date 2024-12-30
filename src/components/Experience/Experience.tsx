@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Stage } from '@pixi/react'
-import { MainContainer } from './MainContainer'
+import { MainContainer } from './MainContainer/MainContainer'
 import { calculateCanvasSize } from '../../helpers/common'
 
 export const Experience = () => {
