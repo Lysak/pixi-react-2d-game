@@ -32,6 +32,8 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
     texture,
     frameWidth: 64,
     frameHeight: 64,
+    totalFrames: 9,
+    animationSpeed: ANIMATION_SPEED,
   })
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       }
     }
 
-    updateSprite(currentDirection.current!, isMoving.current, ANIMATION_SPEED)
+    updateSprite(currentDirection.current!, isMoving.current)
   })
 
   return (

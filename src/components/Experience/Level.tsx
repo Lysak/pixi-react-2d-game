@@ -6,7 +6,6 @@ import {
 } from '../../constants/game-world'
 import { Sprite } from '@pixi/react'
 import levelAsset from '../../assets/tilemap.png'
-// import GridHelper from './GridHelper';
 
 export const Level = () => {
   return (
@@ -19,7 +18,6 @@ export const Level = () => {
         x={OFFSET_X}
         y={OFFSET_Y}
       />
-      {/* <GridHelper /> */}
     </>
   )
 }

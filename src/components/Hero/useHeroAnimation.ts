@@ -7,12 +7,16 @@ interface UseSpriteAnimationProps {
   texture: Texture
   frameWidth: number
   frameHeight: number
+  totalFrames: number
+  animationSpeed: number
 }
 
 export const useHeroAnimation = ({
   texture,
   frameWidth,
   frameHeight,
+  totalFrames,
+  animationSpeed,
 }: UseSpriteAnimationProps) => {
   const [sprite, setSprite] = useState<Sprite | null>(null)
   const frameRef = useRef(0)
@@ -51,11 +55,7 @@ export const useHeroAnimation = ({
     return newSprite
   }
 
-  const updateSprite = (
-    direction: Direction | null,
-    isMoving: boolean,
-    animationSpeed: number
-  ) => {
+  const updateSprite = (direction: Direction | null, isMoving: boolean) => {
     const row = getRowByDirection(direction)
     let column = 0
 
@@ -64,7 +64,7 @@ export const useHeroAnimation = ({
 
       if (elapsedTimeRef.current >= 1) {
         elapsedTimeRef.current = 0
-        frameRef.current = (frameRef.current + 1) % 9
+        frameRef.current = (frameRef.current + 1) % totalFrames
       }
 
       column = frameRef.current
