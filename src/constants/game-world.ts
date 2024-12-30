@@ -12,3 +12,5 @@ export const MOVE_SPEED = 0.03
 export const ANIMATION_SPEED = 0.2
 export const DEFAULT_X_POS = TILE_SIZE * 10
 export const DEFAULT_Y_POS = TILE_SIZE * 15
+
+export const ZOOM = 3

@@ -1,9 +1,9 @@
-import { PixiGrid } from './components/Experience/PixiGrid'
+import { Experience } from './components/Experience/Experience'
 
 const App = () => {
   return (
     <>
-      <PixiGrid />
+      <Experience />
     </>
   )
 }

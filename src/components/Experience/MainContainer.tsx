@@ -3,8 +3,8 @@ import { Texture } from 'pixi.js'
 import { Container, Sprite } from '@pixi/react'
 import { TILE_SIZE } from '../../constants/game-world'
 import { Hero } from '../Hero/Hero'
-import { Level } from './Level'
-import { CameraWrapper } from './CameraWrapper'
+import { Level } from '../Levels/Level'
+import { Camera } from '../Camera/Camera'
 import { Coin } from '../Coin/Coin'
 import backgroundAsset from '@/assets/space-stars.jpg'
 import heroAsset from '@/assets/hero.png'
@@ -14,8 +14,6 @@ import coinGoldAsset from '@/assets/coin-gold.png'
 interface IMainContainerProps {
   canvasSize: { width: number; height: number }
 }
-
-const INITIAL_ZOOM = 3
 
 export const MainContainer = ({
   canvasSize,
@@ -42,16 +40,12 @@ export const MainContainer = ({
         height={canvasSize.height}
       />
       {children}
-      <CameraWrapper
-        zoom={INITIAL_ZOOM}
-        heroPosition={heroPosition}
-        canvasSize={canvasSize}
-      >
+      <Camera heroPosition={heroPosition} canvasSize={canvasSize}>
         <Level />
         <Hero texture={heroTexture} onMove={updateHeroPosition} />
         <Coin texture={coinTextureRed} x={5} y={10} />
         <Coin texture={coinTextureGold} x={6} y={11} />
-      </CameraWrapper>
+      </Camera>
     </Container>
   )
 }
