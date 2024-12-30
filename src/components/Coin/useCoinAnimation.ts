@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Sprite, Texture, Rectangle } from 'pixi.js'
 
-interface UseAnimationProps {
+interface UseCoinAnimationProps {
   texture: Texture
   frameWidth: number
   frameHeight: number
@@ -9,13 +9,13 @@ interface UseAnimationProps {
   animationSpeed: number
 }
 
-export const useAnimation = ({
+export const useCoinAnimation = ({
   texture,
   frameWidth,
   frameHeight,
   totalFrames,
   animationSpeed,
-}: UseAnimationProps) => {
+}: UseCoinAnimationProps) => {
   const [currentTexture, setCurrentTexture] = useState(
     new Texture(
       texture.baseTexture,

@@ -6,14 +6,14 @@ import {
   DEFAULT_Y_POS,
   MOVE_SPEED,
 } from '../../constants/game-world'
-import { useHeroControls } from '../../hooks/useControls'
+import { useHeroControls } from './useHeroControls'
 import { Texture } from 'pixi.js'
 import {
   calculateNewTarget,
   checkCanMove,
   handleMovement,
 } from '../../helpers/common'
-import { useHeroAnimation } from '../../hooks/useHeroAnimation'
+import { useHeroAnimation } from './useHeroAnimation'
 import { Direction } from '../../types/game-world'
 
 interface IHeroProps {

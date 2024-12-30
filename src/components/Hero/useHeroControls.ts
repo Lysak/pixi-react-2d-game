@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Direction } from '../types/game-world'
+import { Direction } from '../../types/game-world'
 
 const DIRECTION_KEYS: Record<string, Direction> = {
   KeyW: 'UP',
