@@ -1,20 +1,22 @@
-import { useRef, useCallback, useEffect } from 'react'
-import { Sprite, Container, useTick } from '@pixi/react'
+import { extend, useTick } from '@pixi/react'
+import { Container, type PointData, Sprite, type Texture } from 'pixi.js'
+import { useCallback, useEffect, useRef } from 'react'
 import {
   ANIMATION_SPEED,
   DEFAULT_X_POS,
   DEFAULT_Y_POS,
   MOVE_SPEED,
 } from '../../constants/game-world'
-import { useHeroControls } from './useHeroControls'
-import { Texture } from 'pixi.js'
 import {
   calculateNewTarget,
   checkCanMove,
   handleMovement,
 } from '../../helpers/common'
+import type { Direction } from '../../types/game-world'
 import { useHeroAnimation } from './useHeroAnimation'
-import { Direction } from '../../types/game-world'
+import { useHeroControls } from './useHeroControls'
+
+extend({ Container, Sprite })
 
 interface IHeroProps {
   texture: Texture
@@ -61,7 +63,7 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
         position.current,
         targetPosition.current,
         MOVE_SPEED,
-        delta
+        delta.deltaTime,
       )
 
       position.current = newPosition
@@ -76,20 +78,20 @@ export const Hero = ({ texture, onMove }: IHeroProps) => {
       }
     }
 
-    updateSprite(currentDirection.current!, isMoving.current)
+    updateSprite(currentDirection.current, isMoving.current)
   })
 
   return (
-    <Container>
+    <pixiContainer>
       {sprite && (
-        <Sprite
+        <pixiSprite
           texture={sprite.texture}
           x={position.current.x}
           y={position.current.y}
           scale={0.5}
-          anchor={[0, 0.4]}
+          anchor={{ x: 0, y: 0.4 } as PointData}
         />
       )}
-    </Container>
+    </pixiContainer>
   )
 }

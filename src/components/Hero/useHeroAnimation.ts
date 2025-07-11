@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
-import { TILE_SIZE } from '../../constants/game-world'
 import { Rectangle, Sprite, Texture } from 'pixi.js'
-import { Direction } from '../../types/game-world'
+import { useRef, useState } from 'react'
+import { TILE_SIZE } from '../../constants/game-world'
+import type { Direction } from '../../types/game-world'
 
 interface UseSpriteAnimationProps {
   texture: Texture
@@ -38,15 +38,19 @@ export const useHeroAnimation = ({
   }
 
   const createSprite = (row: number, column: number) => {
-    const frame = new Texture(
-      texture.baseTexture,
-      new Rectangle(
+    if (!texture || !texture.source) {
+      return null
+    }
+
+    const frame = new Texture({
+      source: texture.source,
+      frame: new Rectangle(
         column * frameWidth,
         row * frameHeight,
         frameWidth,
-        frameHeight
-      )
-    )
+        frameHeight,
+      ),
+    })
 
     const newSprite = new Sprite(frame)
     newSprite.width = TILE_SIZE
@@ -56,6 +60,10 @@ export const useHeroAnimation = ({
   }
 
   const updateSprite = (direction: Direction | null, isMoving: boolean) => {
+    if (!texture || !texture.source) {
+      return
+    }
+
     const row = getRowByDirection(direction)
     let column = 0
 
@@ -71,6 +79,9 @@ export const useHeroAnimation = ({
     }
 
     const newSprite = createSprite(row, column)
+    // if (newSprite) {
+    //   setSprite(newSprite)
+    // }
     setSprite(newSprite)
   }
 

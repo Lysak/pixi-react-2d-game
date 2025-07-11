@@ -1,7 +1,9 @@
-import { useRef, PropsWithChildren } from 'react'
-import { Container, useTick } from '@pixi/react'
-import { Graphics as PIXIGraphics } from 'pixi.js'
+import { extend, useTick } from '@pixi/react'
+import { Container, type Graphics as PIXIGraphics, Sprite } from 'pixi.js'
+import { type PropsWithChildren, useRef } from 'react'
 import { TILE_SIZE, ZOOM } from '../../constants/game-world'
+
+extend({ Container, Sprite })
 
 interface ICameraProps {
   heroPosition: { x: number; y: number }
@@ -40,8 +42,8 @@ export const Camera = ({
   })
 
   return (
-    <Container ref={containerRef} scale={ZOOM}>
+    <pixiContainer ref={containerRef} scale={ZOOM}>
       {children}
-    </Container>
+    </pixiContainer>
   )
 }

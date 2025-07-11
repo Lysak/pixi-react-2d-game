@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Stage } from '@pixi/react'
-import { MainContainer } from './MainContainer/MainContainer'
+import { Application } from '@pixi/react'
+import { useCallback, useEffect, useState } from 'react'
 import { calculateCanvasSize } from '../../helpers/common'
+import { MainContainer } from './MainContainer/MainContainer'
 
 export const Experience = () => {
   const [canvasSize, setCanvasSize] = useState(calculateCanvasSize())
@@ -16,8 +16,18 @@ export const Experience = () => {
   }, [updateCanvasSize])
 
   return (
-    <Stage width={canvasSize.width} height={canvasSize.height}>
+    <Application
+      width={canvasSize.width}
+      height={canvasSize.height}
+      // preference='webgl'
+      // powerPreference='high-performance'
+      // antialias={true}
+      // backgroundColor={0x000000}
+      // backgroundAlpha={1}
+      // autoDensity={true}
+      // preserveDrawingBuffer={true}
+    >
       <MainContainer canvasSize={canvasSize} />
-    </Stage>
+    </Application>
   )
 }

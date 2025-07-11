@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Direction } from '../../types/game-world'
+import type { Direction } from '../../types/game-world'
 
 const DIRECTION_KEYS: Record<string, Direction> = {
   KeyW: 'UP',
@@ -42,7 +42,7 @@ export const useHeroControls = () => {
 
   const getControlsDirection = useCallback(
     (): Direction | null => heldDirections[0] || null,
-    [heldDirections]
+    [heldDirections],
   )
 
   return { getControlsDirection }

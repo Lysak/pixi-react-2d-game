@@ -1,5 +1,5 @@
+import { Rectangle, Sprite, Texture } from 'pixi.js'
 import { useRef, useState } from 'react'
-import { Sprite, Texture, Rectangle } from 'pixi.js'
 
 interface UseCoinAnimationProps {
   texture: Texture
@@ -16,18 +16,26 @@ export const useCoinAnimation = ({
   totalFrames,
   animationSpeed,
 }: UseCoinAnimationProps) => {
-  const [currentTexture, setCurrentTexture] = useState(
-    new Texture(
-      texture.baseTexture,
-      new Rectangle(0, 0, frameWidth, frameHeight)
-    )
-  )
-
-  const spriteRef = useRef<Sprite>(new Sprite(currentTexture))
+  const [, setCurrentTexture] = useState<Texture | null>(null)
+  const spriteRef = useRef<Sprite | null>(null)
   const frameRef = useRef(0)
   const elapsedTimeRef = useRef(0)
 
+  // Initialize sprite and texture
+  if (!spriteRef.current && texture && texture.source) {
+    const initialTexture = new Texture({
+      source: texture.source,
+      frame: new Rectangle(0, 0, frameWidth, frameHeight),
+    })
+    spriteRef.current = new Sprite(initialTexture)
+    setCurrentTexture(initialTexture)
+  }
+
   const updateSprite = (delta: number) => {
+    if (!spriteRef.current || !texture || !texture.source) {
+      return
+    }
+
     elapsedTimeRef.current += delta
 
     const frameDuration = 1 / animationSpeed
@@ -40,12 +48,18 @@ export const useCoinAnimation = ({
         frameRef.current * frameWidth,
         0,
         frameWidth,
-        frameHeight
+        frameHeight,
       )
 
-      const newTexture = new Texture(texture.baseTexture, newFrame)
-      spriteRef.current.texture = newTexture
-      setCurrentTexture(newTexture)
+      const newTexture = new Texture({
+        source: texture.source,
+        frame: newFrame,
+      })
+
+      if (spriteRef.current) {
+        spriteRef.current.texture = newTexture
+        setCurrentTexture(newTexture)
+      }
     }
   }
 
